@@ -1,6 +1,6 @@
 # Cyber Defense 2084
 
-![Cyber Defense 2084](data/image2.png)
+![Cyber Defense 2084](data/menu.png)
 
 Cyber Defense 2084 is a futuristic arcade defense game developed using Processing and Java.
 
