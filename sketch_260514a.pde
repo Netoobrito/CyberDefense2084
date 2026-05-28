@@ -1,5 +1,6 @@
 import processing.sound.*;
 
+PImage studioImg;
 PImage telaInicioImg;
 PImage nivel2Img;
 PImage nivel3Img;
@@ -32,7 +33,6 @@ int tempoSpawn = 0;
 int dificuldade = 80;
 
 boolean gameOver = false;
-boolean telaInicio = true;
 boolean venceu = false;
 
 int tempoMensagemNivel = 0;
@@ -40,6 +40,15 @@ int tempoMensagemNivel = 0;
 PFont fonte;
 
 float anguloMira = 0;
+
+// =========================
+// SISTEMA DE TELAS
+// 0 = Studio
+// 1 = Como Jogar
+// 2 = Gameplay
+// =========================
+
+int tela = 0;
 
 void setup() {
 
@@ -71,6 +80,8 @@ void setup() {
   // IMAGENS
   // =========================
 
+  studioImg = loadImage("studio.png");
+
   telaInicioImg = loadImage("menu.png");
 
   nivel2Img = loadImage("level2.png");
@@ -94,7 +105,9 @@ void setup() {
   jogador = new Jogador();
 
   drones = new ArrayList<Drone>();
+
   tiros = new ArrayList<Tiro>();
+
   explosoes = new ArrayList<Explosao>();
 
   fonte = createFont("Arial", 32);
@@ -106,11 +119,47 @@ void setup() {
 
 void draw() {
 
-  if (telaInicio) {
+  // =========================
+  // TELA DO STUDIO
+  // =========================
 
-    telaInicial();
+  if (tela == 0) {
+
+    image(studioImg, 0, 0, width, height);
+
+    // 3 segundos
+    if (frameCount > 180) {
+
+      tela = 1;
+    }
+
     return;
   }
+
+  // =========================
+  // COMO JOGAR
+  // =========================
+
+  if (tela == 1) {
+
+    image(telaInicioImg, 0, 0, width, height);
+
+    textAlign(CENTER);
+
+    if (frameCount % 60 < 30) {
+
+      fill(0, 255, 255);
+
+      textSize(28);
+
+    }
+
+    return;
+  }
+
+  // =========================
+  // GAMEPLAY
+  // =========================
 
   if (venceu) {
 
@@ -149,17 +198,6 @@ void draw() {
   HUD();
 }
 
-void telaInicial() {
-
-  image(telaInicioImg, 0, 0, width, height);
-
-  fill(255, 255, 0);
-
-  textAlign(CENTER);
-
-  textSize(28);
-}
-
 void telaGameOver() {
 
   image(gameOverImg, 0, 0, width, height);
@@ -169,6 +207,7 @@ void telaGameOver() {
   textAlign(CENTER);
 
   textSize(26);
+
 }
 
 void telaVitoria() {
@@ -180,6 +219,7 @@ void telaVitoria() {
   textAlign(CENTER);
 
   textSize(26);
+
 }
 
 void fundoJogo() {
@@ -361,6 +401,7 @@ void sistemaNiveis() {
     vidas = 5;
 
     drones.clear();
+
     tiros.clear();
 
     tempoMensagemNivel = 240;
@@ -401,17 +442,29 @@ void sistemaNiveis() {
 
 void keyPressed() {
 
-  if (telaInicio && keyCode == ENTER) {
+  // =========================
+  // COMEÇAR O JOGO
+  // =========================
 
-    telaInicio = false;
+  if (tela == 1 && keyCode == ENTER) {
+
+    tela = 2;
   }
+
+  // =========================
+  // REINICIAR
+  // =========================
 
   if ((gameOver || venceu) && (key == 'r' || key == 'R')) {
 
     reiniciarJogo();
   }
 
-  if (key == ' ') {
+  // =========================
+  // TIRO
+  // =========================
+
+  if (tela == 2 && key == ' ') {
 
     float tiroX = jogador.x + 40 + sin(anguloMira) * 90;
 
@@ -424,6 +477,7 @@ void keyPressed() {
     tiros.add(new Tiro(tiroX, tiroY, velocidadeX, velocidadeY));
 
     somTiro.stop();
+
     somTiro.play();
   }
 }
@@ -450,19 +504,19 @@ void reiniciarJogo() {
 
   venceu = false;
 
-  telaInicio = true;
+  tela = 1;
 
   musicaGameOver.stop();
+
   musicaVitoria.stop();
 
   musica.loop();
-
-  loop();
 }
 
 class Jogador {
 
   float x;
+
   float y;
 
   Jogador() {
@@ -485,7 +539,9 @@ class Jogador {
     fill(0, 255, 255);
 
     rect(x + 12, y + 12, 12, 12);
+
     rect(x + 30, y + 12, 12, 12);
+
     rect(x + 48, y + 12, 12, 12);
 
     pushMatrix();
@@ -513,6 +569,7 @@ class Jogador {
 class Drone {
 
   float x;
+
   float y;
 
   float velocidade;
@@ -544,9 +601,11 @@ class Drone {
 class Tiro {
 
   float x;
+
   float y;
 
   float velX;
+
   float velY;
 
   Tiro(float novoX, float novoY, float vx, float vy) {
@@ -582,6 +641,7 @@ class Tiro {
 class Explosao {
 
   float x;
+
   float y;
 
   float tamanho = 10;
@@ -591,6 +651,7 @@ class Explosao {
   Explosao(float novoX, float novoY) {
 
     x = novoX;
+
     y = novoY;
   }
 
